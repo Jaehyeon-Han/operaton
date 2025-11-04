@@ -1,0 +1,12 @@
+name: Add Good First Issue Comment from Template
+
+on:
+  issues:
+    types: [labeled]
+  
+jobs:
+  add-good-first-issue-comment:
+    runs-on: ubuntu-latest
+    if: github.event.label.name == 'good first issue'
+    steps:
+      - run: echo "good first issue labeled."
