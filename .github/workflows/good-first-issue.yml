@@ -9,4 +9,32 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.label.name == 'good first issue'
     steps:
-      - run: echo "good first issue labeled."
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        
+      - name: Add template to PR
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+              
+            const template = fs.readFileSync(
+              path.join(process.env.GITHUB_WORKSPACE, '.github/templates/comment_good_first_issue.md'),
+              'utf8'
+            );
+            
+            const { data: issue } = await github.rest.issues.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number
+            });
+            
+            const issueBody = issue.body ?? '';
+            
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: issueBody + '\n\n' + template
+            });
